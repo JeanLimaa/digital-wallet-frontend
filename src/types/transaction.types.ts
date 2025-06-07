@@ -1,11 +1,23 @@
+interface userInTransaction {
+  email: string;
+  name: string;
+}
+
+type TransactionType = 'DEPOSIT' | 'TRANSFER' | 'REVERSAL' | 'RECEIVED';
+
 export interface Transaction {
   id: string;
-  type: 'DEPOSIT' | 'TRANSFER' | 'REVERSAL';
+  type: TransactionType;
   amount: number;
   description?: string;
   createdAt: string;
-  toUser: {
-    email: string;
-    name: string;
-  }
+  toUser: userInTransaction;
+  fromUser?: userInTransaction;
+  isPositive: boolean;
+  reversedTransaction?: {
+    id: string;
+    amount: number;
+    type: TransactionType;
+    createdAt: string;
+  };
 }
