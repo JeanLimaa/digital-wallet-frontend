@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from 'next/font/google';
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Carteira Digital",
@@ -22,6 +23,8 @@ export default function RootLayout({
         className={`antialiased ${inter.className}`}
       >
         {children}
+
+        <Toaster />
       </body>
     </html>
   );
