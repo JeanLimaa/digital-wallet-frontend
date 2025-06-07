@@ -2,7 +2,7 @@ import z from "zod";
 
 export const loginSchema = z.object({
   email: z.string({message: 'E-mail é obrigatorio'}).email({ message: 'E-mail inválido' }),
-  password: z.string().min(6, { message: 'Senha deve ter ao menos 6 caracteres' }),
+  password: z.string({message: 'Senha é obrigatorio'}).min(6, { message: 'Senha deve ter ao menos 6 caracteres' }),
 });
 
 export const registerSchema = loginSchema.extend({
