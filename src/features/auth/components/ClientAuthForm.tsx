@@ -6,6 +6,7 @@ import { loginAction, registerAction } from '@/actions/auth';
 import { DEFAULT_AUTHENTICATED_REDIRECT, DEFAULT_UNAUTHENTICATED_REDIRECT } from '@/constants/routes';
 import { InputForm } from '../components/InputForm';
 import { SubmitButton } from './SubmitButton';
+import { toast } from 'sonner';
 
 type Props = {
   type: 'login' | 'register';
@@ -16,12 +17,16 @@ type Props = {
 
 export function ClientAuthForm({ type, title, showNameInput, buttonLabel }: Props) {
   const router = useRouter();
-  const action = type === 'login' ? loginAction : registerAction;
+  const isLogin = type === 'login';
+  const action = isLogin ? loginAction : registerAction;
 
   const [state, formAction] = useFormState(action, { error: '', success: false });
 
   if (state.success) {
-    router.push(type === 'login' ? DEFAULT_AUTHENTICATED_REDIRECT : DEFAULT_UNAUTHENTICATED_REDIRECT);
+    toast.success(
+      isLogin ? 'Login realizado com sucesso!' : 'Cadastro realizado com sucesso!'
+    );
+    router.push(isLogin ? DEFAULT_AUTHENTICATED_REDIRECT : DEFAULT_UNAUTHENTICATED_REDIRECT);
   }
 
   return (
