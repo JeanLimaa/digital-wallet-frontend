@@ -61,7 +61,7 @@ export function WalletTabs(props: WalletTabsProps) {
                                 setValue={props.setTransferValue}
                                 placeholder="Valor para transferência"
                             />
-                            <Button className="w-full" onClick={props.handleTransfer}>
+                            <Button className="w-full" onClick={props.handleTransfer} disabled={!props.transferValue || !props.transferEmail}>
                                 Transferir
                             </Button>
                         </CardContent>

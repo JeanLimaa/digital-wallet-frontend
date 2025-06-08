@@ -24,7 +24,7 @@ export function WalletHeader({ balance }: { balance: number }) {
                 <Button variant="outline" onClick={logout}>Sair</Button>
             </div>
 
-            <p className="mb-4 text-center text-lg font-semibold">Saldo atual: R$ {formatToBrlCurrency(balance)}</p>
+            <p className="mb-4 text-center text-lg font-semibold">Saldo atual: {formatToBrlCurrency(balance)}</p>
         </header>
     )
 }
