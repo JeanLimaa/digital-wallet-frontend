@@ -28,11 +28,14 @@ api.interceptors.request.use(
 
 export async function apiSafeCall<T>(
     promise: Promise<{ data: T }>,
-    includeRevalidation: boolean = true
+    includeRevalidation: boolean = true,
+    revalidationPath: string = '/wallet'
 ): Promise<ApiResponse<T>> {
     try {
         const {data} = await promise;
-        includeRevalidation && revalidatePath('/wallet');
+        
+        if (includeRevalidation) revalidatePath(revalidationPath);
+
         return { success: data };
     } catch (err) {
         const error = err as AxiosError<any>;
