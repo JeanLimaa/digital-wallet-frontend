@@ -1,45 +1,19 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import {
-    getTransactions, deposit, transfer, reverseTransaction
+     deposit, transfer, reverseTransaction
 } from '@/actions/transactions';
 import {
-    getUserByEmail, getBalance
+    getUserByEmail
 } from '@/actions/user';
-import { clearTokenCookie } from '@/lib/auth';
-import { Transaction } from '@/types/transaction.types';
 import { depositSchema } from '@/schemas/deposit.schema';
 import { transferSchema } from '@/schemas/transfer.schema';
 
 export function useWallet() {
-    const router = useRouter();
-
     const [depositValue, setDepositValue] = useState('');
     const [transferValue, setTransferValue] = useState('');
     const [transferEmail, setTransferEmail] = useState('');
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [balance, setBalance] = useState(0);
-    const [loading, setLoading] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
-
-    useEffect(() => {
-        loadInitialData();
-    }, []);
-
-    async function loadInitialData() {
-        setLoading(true);
-        const [transaction, balance] = await Promise.all([getTransactions(), getBalance()]);
-
-        if (transaction?.error || balance?.error) {
-            return toast.error(transaction?.error || balance?.error || 'Erro ao carregar dados');
-        }
-
-        setTransactions(transaction?.success || []);
-        setBalance(Number(balance?.success?.balance || 0));
-
-        setLoading(false);
-    }
 
     async function handleDeposit() {
         const parsed = parseFloat(depositValue.replace(',', '.'));
@@ -60,10 +34,9 @@ export function useWallet() {
 
         toast.success('Depósito realizado com sucesso!');
         setDepositValue('');
-        await loadInitialData();
     }
 
-    async function handleTransfer() {
+    async function handleTransfer(balance: number) {
         const result = transferSchema.safeParse({ amount: parseFloat(transferValue), email: transferEmail });
         
         if (!result.success) {
@@ -93,13 +66,11 @@ export function useWallet() {
         toast.success('Transferência realizada!');
         setTransferEmail('');
         setTransferValue('');
-        await loadInitialData();
     }
 
     async function handleReverseTransaction(id: string) {
         const result = await reverseTransaction(id);
         if (!result.success) return toast.error(result.error || 'Erro ao reverter');
-        await loadInitialData();
         toast.success('Transação revertida');
     }
 
@@ -108,7 +79,6 @@ export function useWallet() {
         transferValue, setTransferValue,
         transferEmail, setTransferEmail,
         confirmOpen, setConfirmOpen,
-        transactions, loading, balance,
         handleDeposit, handleTransfer, handleTransferConfirmed,
         handleReverseTransaction,
         confirmationDialogProps: {
