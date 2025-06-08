@@ -3,10 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { formatToBrlCurrency } from '@/lib/currency';
 import { Transaction } from '@/types/transaction.types';
+import { Check } from 'lucide-react';
+import { Undo2 } from 'lucide-react';
 
 interface TransactionListProps {
   transactions: Transaction[];
-  loading: boolean;
   handleReverseTransaction: (id: string) => void;
 }
 
@@ -23,16 +24,12 @@ function formatDate(date: string | Date) {
 
 export function TransactionList({
   transactions,
-  loading,
   handleReverseTransaction
 }: TransactionListProps) {
   const isReversal = (tx: Transaction) => tx.type === 'REVERSAL';
   const isDeposit = (tx: Transaction) => tx.type === 'DEPOSIT';
   const isTransfer = (tx: Transaction) => tx.type === 'TRANSFER';
-
-  if (loading) {
-    return <p className="text-sm text-muted-foreground">Carregando transações...</p>;
-  }
+  const isReceived = (tx: Transaction) => tx.type === 'RECEIVED';
 
   if (!transactions.length) {
     return <p className="text-sm text-muted-foreground">Nenhuma transação encontrada.</p>;
@@ -49,6 +46,7 @@ export function TransactionList({
             <div>
               <p className="font-medium">{transactionTypeLabels[tx.type]}</p>
               <p className="text-sm text-muted-foreground">{formatDate(tx.createdAt)}</p>
+
               {isReversal(tx) && tx.reversedTransaction ? (
                  <p className="text-xs text-red-600 mt-1">
                   Estorno de {transactionTypeLabels[tx.reversedTransaction.type]} de R$ {formatToBrlCurrency(tx.reversedTransaction.amount)} realizado em {formatDate(tx.reversedTransaction.createdAt)}
@@ -59,6 +57,20 @@ export function TransactionList({
                   <p className="text-xs text-muted-foreground mt-2">Para: {tx.toUser.email}</p>
                 </>
               )}
+
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                Status: {tx.status === 'COMPLETED' ? (
+                  <span className="inline-flex items-center gap-1 text-green-600 font-semibold">
+                    <Check className="w-3 h-3" />
+                    Concluído
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-red-600 font-semibold">
+                    <Undo2 className="w-3 h-3" />
+                    Revertido
+                  </span>
+                )}
+              </p>
             </div>
 
             <div className="flex flex-col items-end gap-y-1">
@@ -68,7 +80,7 @@ export function TransactionList({
               `}>
                 {tx.isPositive ? '+' : '-'} {formatToBrlCurrency(tx.amount)}
               </p>
-              {(isDeposit(tx) || isTransfer(tx)) && (
+              {(isDeposit(tx) || isTransfer(tx) || isReceived(tx)) && tx.status !== 'REVERSED' && (
                 <Button size="sm" variant="destructive" className="mt-1" onClick={() => handleReverseTransaction(tx.id)}>
                   Reverter
                 </Button>
