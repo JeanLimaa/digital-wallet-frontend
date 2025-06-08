@@ -31,12 +31,12 @@ export function useWallet() {
         setLoading(true);
         const [transaction, balance] = await Promise.all([getTransactions(), getBalance()]);
 
-        if (transaction.error || balance.error) {
-            return toast.error(transaction.error || balance.error || 'Erro ao carregar dados');
+        if (transaction?.error || balance?.error) {
+            return toast.error(transaction?.error || balance?.error || 'Erro ao carregar dados');
         }
 
         setTransactions(transaction?.success || []);
-        setBalance(Number(balance.success?.balance || 0));
+        setBalance(Number(balance?.success?.balance || 0));
 
         setLoading(false);
     }
@@ -96,16 +96,6 @@ export function useWallet() {
         await loadInitialData();
     }
 
-    async function logout() {
-        try {
-            await clearTokenCookie();
-            toast.success('Você saiu com sucesso!');
-            router.refresh();
-        } catch {
-            toast.error('Erro ao sair');
-        }
-    }
-
     async function handleReverseTransaction(id: string) {
         const result = await reverseTransaction(id);
         if (!result.success) return toast.error(result.error || 'Erro ao reverter');
@@ -120,7 +110,7 @@ export function useWallet() {
         confirmOpen, setConfirmOpen,
         transactions, loading, balance,
         handleDeposit, handleTransfer, handleTransferConfirmed,
-        handleReverseTransaction, logout,
+        handleReverseTransaction,
         confirmationDialogProps: {
             open: confirmOpen,
             onCancel: () => setConfirmOpen(false),
